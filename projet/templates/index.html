@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>My Website</title>
+</head>
+
+<body>
+  <!-- Header -->
+  <section id="header">
+    <div class="header container">
+      <div class="nav-bar">
+        <div class="brand">
+          <a href="#hero">
+            <h1><span>E-</span>commerce <span></span>site</h1>
+          </a>
+        </div>
+        <div class="nav-list">
+          <div class="hamburger">
+            <div class="bar"></div>
+          </div>
+          <ul>
+            <li><a href="#hero" data-after="Home">Home</a></li>
+            <li><a href="#projects" data-after="Projects">Projects</a></li>
+            <li><a href="#about" data-after="About">About</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End Header -->
+
+
+  <!-- Hero Section  -->
+  <section id="hero">
+    <div class="hero container">
+      <div>
+        <h1>Hello, <span></span></h1>
+        <h1>IN OUR SITE FOR EASY<span></span></h1>
+        <h1>SEARCH OF SIMILAR IMAGES. <span></span></h1>
+        <a href="#projects" type="button" class="cta">GO START</a>
+      </div>
+    </div>
+  </section>
+ 
+
+  <!-- Projects Section -->
+  <section id="projects">
+    <div class="projects container">
+      <div class="projects-header">
+        <h1 class="section-title">our <span>treatment</span></h1>
+      
+      <h5 style="margin-left: 44%;">Search Box</h5>
+
+      <div class="box" style="margin-left: 10%;">
+          <i class="fa fa-search" aria-hidden="true" ></i>
+          <img src="static/OIP (1).jpg" alt="Icon Image" onclick="showCustomDialog()">
+  
+      </div>
+      <h1 id="uploadedImage" style="margin-left: 40%; margin-top: 20px;margin-bottom: 30px; "></h1>
+  
+      <div id="uploadedImageDiv">
+  
+          <img id="uploadedIMAGE" onclick="showCustomDialog() " style="margin-left: 40%;"  >
+      </div>
+      <h1 id="uploadedImageTitle" style="margin-left: 40%;margin-top: 30px;margin-bottom: 50px;"></h1>
+  
+  
+      <div id="overlay" onclick="closeCustomDialog()"></div>
+    <div id="customDialog">
+        <input type="file" name="file" id="file" accept="image/*" class="form-control-file" style="margin-bottom: 20px;">
+        <button onclick="searchAction()">Search</button>
+        <button onclick="closeCustomDialog()">Close</button>
+    </div>
+
+
+    <div id="searchResults"  style="margin-left: 40px;">
+    </div>
+      
+    <script>
+      function showCustomDialog() {
+          // Afficher le dialog et l'overlay
+          document.getElementById('customDialog').style.display = 'block';
+          document.getElementById('overlay').style.display = 'block';
+      }
+  
+      function closeCustomDialog() {
+          // Cacher le dialog et l'overlay
+          document.getElementById('customDialog').style.display = 'none';
+          document.getElementById('overlay').style.display = 'none';
+      }
+  
+      function searchAction() {
+          // Récupérer la valeur du fichier
+          var input = document.getElementById('file');
+          var file = input.files[0];
+  
+          // Vérifier si un fichier est sélectionné
+
+          if (file) {
+
+              // Afficher l'image téléchargée dans l'élément img
+              var uploaded = document.getElementById('uploadedImage');
+              var uploadeddiv = document.getElementById('uploadedIMAGE');
+
+              var reader = new FileReader();
+              uploaded.textContent=  'Images choisie';
+              uploaded.style.color= '#dc143c';
+              uploaded.style.fontSize= '3rem';
+              reader.onload = function (e) {
+                  uploadeddiv.src = e.target.result;
+                  uploadeddiv.style.marginTop = '20px'; 
+                  uploadeddiv.style.width = '250px';
+                  uploadeddiv.style.height = '180px'; // Définir la marge supérieure à 20px
+// Définir la marge supérieure à 20px
+// Définir la marge supérieure à 20px
+
+
+              };
+  
+              reader.readAsDataURL(file);
+              var uploadedImageDiv = document.getElementById('uploadedImageDiv');
+              uploadedImageDiv.innerHTML = '';  // Effacer le contenu existant
+             uploadedImageDiv.appendChild(uploadeddiv);
+ 
+  
+              // Envoyer le fichier au serveur
+              var formData = new FormData();
+              formData.append('file', file);
+  
+              // Requête Ajax pour envoyer le fichier au serveur
+              // Exemple avec JavaScript natif (pas de jQuery)
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', 'http://127.0.0.1:5000/process_image', true);
+              xhr.onload = function () {
+                  if (xhr.status === 200) {
+                      // Traitement de la réponse du serveur
+                      var response = JSON.parse(xhr.responseText);
+                      displaySearchResults(response);
+                  } else {
+                      console.error('Erreur de la requête:', xhr.statusText);
+                  }
+              };
+              xhr.send(formData);
+          }
+  
+          // Fermer le dialog
+          closeCustomDialog();
+      }
+
+      function displaySearchResults(response) {
+      var searchResultsDiv = document.getElementById('searchResults');
+      var titre = document.getElementById('uploadedImageTitle');
+      searchResultsDiv.innerHTML = '';
+      titre.textContent = 'Image similaires'; 
+      titre.style.color='#dc143c';
+      titre.style.fontSize='3rem'
+      // Mettre à jour le titre
+
+
+  if (response && response.similar_images) {
+
+      response.similar_images.forEach(function (imgPath, index) {
+
+          var imgElement = document.createElement('img');
+          imgElement.src = imgPath;
+          imgElement.alt = 'Similar Image ' + (index + 1);
+          imgElement.style.width = '260px'; // Définir la largeur à 100%
+          imgElement.style.height = '220px'; 
+          imgElement.style.margin = '10px'; // Définir la largeur à 100%
+          searchResultsDiv.appendChild(imgElement);
+          console.log('Image Path:', imgPath);
+
+
+      });
+  } else {
+      searchResultsDiv.innerHTML = 'Aucun résultat trouvé.';
+  }
+}
+
+
+
+  </script>
+
+        <!-- Placeholder for displaying search results -->
+    </div>
+    <style>
+        /* Styles for the custom dialog */
+        #customDialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        /* Styles for the overlay background */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+      <div class="all-projects">
+     
+      
+    </div>
+  </section>
+  <!-- End Projects Section -->
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="about container">
+      <div class="col-left">
+        <div class="about-img">
+        
+        </div>
+      </div>
+      <div class="col-right">
+        <h1 class="section-title">About <span>us</span></h1>
+      
+        <p>Welcome to our website, where users can effortlessly explore visually similar images. Simply upload an image,
+           and our site will display related images, providing an intuitive and efficient way to discover visual connections. 
+           Explore the world of images with ease on our platform.</p>
+        <a href="#" class="cta">Download Resume</a>
+      </div>
+    </div>
+  </section>
+ 
+
+  <!-- Footer -->
+  <section id="footer">
+    <div class="footer container">
+      <div class="brand">
+        <h1><span>E</span>commerce <span>S</span>ite</h1>
+      </div>
+      <h2>Your Complete Web Solution</h2>
+      <div class="social-icon">
+        <div class="social-item">
+          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/facebook-new.png" /></a>
+        </div>
+        <div class="social-item">
+          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/instagram-new.png" /></a>
+        </div>
+        <div class="social-item">
+          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/twitter.png" /></a>
+        </div>
+        <div class="social-item">
+          <a href="#"><img src="https://img.icons8.com/bubbles/100/000000/behance.png" /></a>
+        </div>
+      </div>
+      <p>Copyright © 2020 All rights reserved</p>
+    </div>
+  </section>
+  <!-- End Footer -->
+  <script src="static/app.js"></script>
+</body>
+
+</html>
